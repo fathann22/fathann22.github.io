@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kalkulator Modern + History</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: linear-gradient(135deg, #1f1c2c, #928dab);
+            gap: 20px;
+            padding: 20px;
+        }
+
+        .calculator {
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(15px);
+            padding: 20px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+            width: 320px;
+
+            /* TAMBAHAN ANIMASI */
+            animation: fadeUp 5s ease;
+        }
+
+        .title {
+            text-align: center;
+            margin-bottom: 12px;
+            color: #00ffcc;
+            text-shadow: 0 0 8px #00ffcc;
+        }
+
+        .display {
+            width: 100%;
+            height: 70px;
+            border: none;
+            border-radius: 15px;
+            margin-bottom: 15px;
+            padding: 10px;
+            font-size: 28px;
+            text-align: right;
+            background: rgba(0, 0, 0, 0.6);
+            color: #00ffcc;
+        }
+
+        .buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+        }
+
+        button {
+            height: 60px;
+            border: none;
+            border-radius: 15px;
+            font-size: 18px;
+            cursor: pointer;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            transition: all 0.2s ease;
+        }
+
+        button:hover {
+            transform: scale(1.05);
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        button:active {
+            transform: scale(0.92);
+        }
+
+        .operator {
+            background: #ff9f43;
+        }
+
+        .equal {
+            background: #00c853;
+            grid-column: span 2;
+        }
+
+        .clear {
+            background: #ff5252;
+        }
+
+        .delete {
+            background: #607d8b;
+        }
+
+        /* History */
+        .history {
+            width: 260px;
+            max-height: 400px;
+            overflow-y: auto;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 15px;
+            border-radius: 15px;
+            color: white;
+            animation: fadeUp 5s ease;
+        }
+
+        .history h3 {
+            margin-bottom: 10px;
+            font-size: 18px;
+        }
+
+        .history-item {
+            padding: 8px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            font-size: 14px;
+            animation: fadeIn 0.4s ease;
+            cursor: pointer;
+        }
+
+        .history-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .history-item:last-child {
+            border-bottom: none;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="calculator">
+        <h2 class="title">Kalkulator Sederhana</h2>
+        <input type="text" id="display" class="display" disabled>
+
+        <div class="buttons">
+            <button class="clear" onclick="clearDisplay()">C</button>
+            <button class="delete" onclick="deleteLast()">⌫</button>
+            <button class="delete" onclick="clearHistory()">🗑</button>
+            <button class="operator" onclick="append('+')">+</button>
+
+            <button onclick="append('7')">7</button>
+            <button onclick="append('8')">8</button>
+            <button onclick="append('9')">9</button>
+            <button class="operator" onclick="append('-')">−</button>
+
+            <button onclick="append('4')">4</button>
+            <button onclick="append('5')">5</button>
+            <button onclick="append('6')">6</button>
+            <button class="operator" onclick="append('*')">×</button>
+
+            <button onclick="append('1')">1</button>
+            <button onclick="append('2')">2</button>
+            <button onclick="append('3')">3</button>
+            <button class="operator" onclick="append('/')">÷</button>
+
+            <button class="equal" onclick="calculate()">=</button>
+            <button onclick="append('0')">0</button>
+            <button onclick="append('.')">.</button>
+        </div>
+    </div>
+
+    <div class="history">
+        <h3>Riwayat</h3>
+        <div id="historyList"></div>
+    </div>
+
+    <script>
+        const display = document.getElementById('display');
+        const historyList = document.getElementById('historyList');
+
+        function append(value) { display.value += value; }
+
+        function clearDisplay() { display.value = ''; }
+
+        function deleteLast() {
+            display.value = display.value.slice(0, -1);
+        }
+
+        function addToHistory(expression, result) {
+            const item = document.createElement('div');
+            item.classList.add('history-item');
+            item.textContent = `${expression} = ${result}`;
+
+            // animasi delay biar berurutan
+            const delay = historyList.children.length * 0.05;
+            item.style.animationDelay = delay + 's';
+
+            // klik untuk pakai lagi
+            item.onclick = () => {
+                display.value = result;
+            };
+
+            historyList.prepend(item);
+        }
+
+        function clearHistory() {
+            if (confirm('Hapus semua riwayat?')) {
+                historyList.innerHTML = '';
+            }
+        }
+
+        function calculate() {
+            try {
+                const expression = display.value;
+                const result = eval(expression);
+                display.value = result;
+                addToHistory(expression, result);
+            } catch { 
+                display.value = 'Error';
+            }
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (!isNaN(e.key) || ['+', '-', '*', '/', '.'].includes(e.key)) {
+                append(e.key);
+            } else if (e.key === 'Enter') {
+                calculate();
+            } else if (e.key === 'Backspace') {
+                deleteLast();
+            } else if (e.key.toLowerCase() === 'c') {
+                clearDisplay();
+            }
+        });
+    </script>
+
+</body>
+
+</html>
