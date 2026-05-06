@@ -1,0 +1,898 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Game Tebak Kata</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;700&display=swap');
+
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        :root {
+            --bg: #0d0d1a;
+            --surface: #141428;
+            --card: #1a1a35;
+            --border: rgba(255, 255, 255, 0.08);
+            --blue: #4a90e2;
+            --green: #48bb78;
+            --red: #fc8181;
+            --amber: #f6ad55;
+            --text: #e2e8f0;
+            --muted: #718096;
+            --accent: #7f5af0;
+        }
+
+        body {
+            font-family: 'Syne', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem 1rem;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image: radial-gradient(1px 1px at 20% 30%, rgba(255, 255, 255, 0.4) 0%, transparent 100%), radial-gradient(1px 1px at 80% 10%, rgba(255, 255, 255, 0.3) 0%, transparent 100%), radial-gradient(1px 1px at 50% 80%, rgba(255, 255, 255, 0.3) 0%, transparent 100%), radial-gradient(2px 2px at 35% 55%, rgba(127, 90, 240, 0.4) 0%, transparent 100%), radial-gradient(2px 2px at 70% 40%, rgba(74, 144, 226, 0.3) 0%, transparent 100%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .container {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            max-width: 500px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .header-icon {
+            font-family: 'Space Mono', monospace;
+            font-size: 28px;
+            color: var(--accent);
+            margin-bottom: 8px;
+        }
+
+        .header h1 {
+            font-size: 22px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            color: #fff;
+        }
+
+        .header p {
+            font-size: 13px;
+            color: var(--muted);
+            margin-top: 4px;
+        }
+
+        .score-row {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 1.2rem;
+        }
+
+        .score-card {
+            flex: 1;
+            background: var(--surface);
+            border: 0.5px solid var(--border);
+            border-radius: 12px;
+            padding: 12px;
+            text-align: center;
+        }
+
+        .score-card .num {
+            font-family: 'Space Mono', monospace;
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--blue);
+        }
+
+        .score-card .lbl {
+            font-size: 11px;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 2px;
+        }
+
+        .game-card {
+            background: var(--card);
+            border: 0.5px solid var(--border);
+            border-radius: 16px;
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.2rem;
+        }
+
+        .clue-wrap {
+            background: var(--surface);
+            border: 0.5px solid rgba(127, 90, 240, 0.3);
+            border-left: 3px solid var(--accent);
+            border-radius: 8px;
+            padding: 12px 16px;
+        }
+
+        .clue-label {
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: var(--accent);
+            margin-bottom: 6px;
+            font-family: 'Space Mono', monospace;
+        }
+
+        .clue-text {
+            font-size: 15px;
+            color: var(--text);
+            line-height: 1.5;
+            font-weight: 600;
+        }
+
+        .blanks-row {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            justify-content: center;
+            min-height: 52px;
+            align-items: flex-end;
+        }
+
+        .blank-cell {
+            min-width: 36px;
+            height: 48px;
+            border-bottom: 2.5px solid rgba(74, 144, 226, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Space Mono', monospace;
+            font-size: 20px;
+            font-weight: 700;
+            color: transparent;
+            transition: all 0.25s;
+            animation: blankIn 0.3s ease both;
+        }
+
+        .blank-cell.revealed {
+            border-bottom-color: var(--green);
+            color: var(--green);
+            animation: pop 0.3s ease;
+        }
+
+        .blank-cell.shake {
+            animation: shake 0.4s;
+            border-bottom-color: var(--red);
+        }
+
+        @keyframes pop {
+            0% {
+                transform: scale(0.7)
+            }
+
+            60% {
+                transform: scale(1.15)
+            }
+
+            100% {
+                transform: scale(1)
+            }
+        }
+
+        @keyframes shake {
+
+            0%,
+            100% {
+                transform: translateX(0)
+            }
+
+            20% {
+                transform: translateX(-5px)
+            }
+
+            60% {
+                transform: translateX(5px)
+            }
+        }
+
+        @keyframes blankIn {
+            0% {
+                opacity: 0;
+                transform: translateY(10px)
+            }
+
+            100% {
+                opacity: 1;
+                transform: translateY(0)
+            }
+        }
+
+        @keyframes clueIn {
+            0% {
+                opacity: 0;
+                transform: translateX(-12px)
+            }
+
+            100% {
+                opacity: 1;
+                transform: translateX(0)
+            }
+        }
+
+        @keyframes scoreBump {
+            0% {
+                transform: scale(1)
+            }
+
+            40% {
+                transform: scale(1.4);
+                color: var(--green)
+            }
+
+            100% {
+                transform: scale(1)
+            }
+        }
+
+        @keyframes pillIn {
+            0% {
+                transform: scale(0) rotate(-10deg);
+                opacity: 0
+            }
+
+            100% {
+                transform: scale(1) rotate(0);
+                opacity: 1
+            }
+        }
+
+        @keyframes heartbeat {
+
+            0%,
+            100% {
+                transform: scale(1)
+            }
+
+            14% {
+                transform: scale(1.2)
+            }
+
+            28% {
+                transform: scale(1)
+            }
+
+            42% {
+                transform: scale(1.1)
+            }
+
+            56% {
+                transform: scale(1)
+            }
+        }
+
+        @keyframes heartLose {
+            0% {
+                transform: scale(1.3);
+                filter: drop-shadow(0 0 10px rgba(252, 129, 129, 1))
+            }
+
+            40% {
+                transform: scale(0.5) rotate(-20deg)
+            }
+
+            100% {
+                transform: scale(0.8);
+                opacity: 0.12;
+                filter: none
+            }
+        }
+
+        .hearts-row {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+        }
+
+        .heart {
+            font-size: 22px;
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            filter: drop-shadow(0 0 6px rgba(252, 129, 129, 0.6));
+            animation: heartbeat 2s ease-in-out infinite;
+            display: inline-block;
+        }
+
+        .heart:nth-child(2) {
+            animation-delay: 0.15s
+        }
+
+        .heart:nth-child(3) {
+            animation-delay: 0.3s
+        }
+
+        .heart:nth-child(4) {
+            animation-delay: 0.45s
+        }
+
+        .heart:nth-child(5) {
+            animation-delay: 0.6s
+        }
+
+        .heart.lost {
+            opacity: 0.12;
+            filter: none;
+            animation: none;
+            transform: scale(0.8);
+        }
+
+        .heart.losing {
+            animation: heartLose 0.5s ease forwards;
+        }
+
+        .history-section {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .history-label {
+            font-size: 10px;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-family: 'Space Mono', monospace;
+        }
+
+        .history-pills {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+            min-height: 28px;
+        }
+
+        .pill {
+            font-family: 'Space Mono', monospace;
+            font-size: 12px;
+            font-weight: 700;
+            padding: 3px 10px;
+            border-radius: 20px;
+            animation: pillIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .pill.hit {
+            background: rgba(72, 187, 120, 0.15);
+            color: var(--green);
+            border: 0.5px solid var(--green);
+        }
+
+        .pill.miss {
+            background: rgba(252, 129, 129, 0.12);
+            color: var(--red);
+            border: 0.5px solid var(--red);
+        }
+
+        .score-bump {
+            animation: scoreBump 0.4s ease;
+        }
+
+        .clue-in {
+            animation: clueIn 0.4s ease;
+        }
+
+        .input-row {
+            display: flex;
+            gap: 10px;
+        }
+
+        .letter-input {
+            flex: 1;
+            background: var(--surface);
+            border: 0.5px solid var(--border);
+            border-radius: 10px;
+            color: #fff;
+            font-family: 'Space Mono', monospace;
+            font-size: 22px;
+            font-weight: 700;
+            text-align: center;
+            padding: 10px;
+            text-transform: uppercase;
+            outline: none;
+            height: 54px;
+            transition: border-color 0.2s, background 0.2s;
+        }
+
+        .letter-input:focus {
+            border-color: var(--accent);
+            background: rgba(127, 90, 240, 0.08);
+        }
+
+        .letter-input:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        .tebak-btn {
+            background: var(--accent);
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            font-family: 'Syne', sans-serif;
+            font-size: 15px;
+            font-weight: 700;
+            padding: 0 24px;
+            height: 54px;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.1s;
+        }
+
+        .tebak-btn:hover {
+            background: #6b46f0;
+        }
+
+        .tebak-btn:active {
+            transform: scale(0.97);
+        }
+
+        .tebak-btn:disabled {
+            background: #2d2d4e;
+            color: var(--muted);
+            cursor: not-allowed;
+        }
+
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            backdrop-filter: blur(4px);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+        }
+
+        .modal-overlay.visible {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .modal-box {
+            background: var(--card);
+            border: 0.5px solid var(--border);
+            border-radius: 20px;
+            padding: 2rem 1.8rem;
+            text-align: center;
+            max-width: 340px;
+            width: 90%;
+            transform: scale(0.8);
+            transition: transform 0.3s;
+        }
+
+        .modal-overlay.visible .modal-box {
+            transform: scale(1);
+        }
+
+        .modal-icon {
+            font-size: 48px;
+            margin-bottom: 12px;
+        }
+
+        .modal-title {
+            font-size: 22px;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 8px;
+        }
+
+        .modal-msg {
+            font-size: 14px;
+            color: var(--muted);
+            line-height: 1.6;
+            margin-bottom: 6px;
+        }
+
+        .modal-answer {
+            font-family: 'Space Mono', monospace;
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--amber);
+            margin: 8px 0 20px;
+        }
+
+        .modal-btn {
+            background: var(--accent);
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            font-family: 'Syne', sans-serif;
+            font-size: 15px;
+            font-weight: 700;
+            padding: 12px 0;
+            width: 100%;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .modal-btn:hover {
+            background: #6b46f0;
+        }
+
+        .toast {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-60px);
+            background: var(--card);
+            border: 0.5px solid var(--border);
+            color: var(--amber);
+            font-family: 'Space Mono', monospace;
+            font-size: 13px;
+            padding: 10px 20px;
+            border-radius: 30px;
+            z-index: 200;
+            transition: transform 0.3s;
+            white-space: nowrap;
+        }
+
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="header-icon">&lt;/&gt;</div>
+            <h1>Game Tebak Kata</h1>
+            <p>Tebak nama permainan tradisional Indonesia!</p>
+        </div>
+
+        <div class="score-row">
+            <div class="score-card">
+                <div class="num" id="skor-num">0</div>
+                <div class="lbl">Skor</div>
+            </div>
+            <div class="score-card">
+                <div class="num" id="ronde-num">1</div>
+                <div class="lbl">Ronde</div>
+            </div>
+            <div class="score-card">
+                <div class="num" id="kesempatan-num">5</div>
+                <div class="lbl">Kesempatan</div>
+            </div>
+        </div>
+
+        <div class="game-card">
+            <div class="clue-wrap">
+                <div class="clue-label">// Clue</div>
+                <div class="clue-text" id="clue-text">Loading...</div>
+            </div>
+            <div class="blanks-row" id="blanks-row"></div>
+            <div class="hearts-row" id="hearts-row"></div>
+            <div class="history-section">
+                <div class="history-label">// Riwayat Huruf</div>
+                <div class="history-pills" id="history-pills"></div>
+            </div>
+            <div class="input-row">
+                <input class="letter-input" id="letter-input" type="text" maxlength="1" placeholder="A"
+                    autocomplete="off" />
+                <button class="tebak-btn" id="tebak-btn">Tebak</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="modal-overlay">
+        <div class="modal-box">
+            <div class="modal-icon" id="modal-icon">🎉</div>
+            <div class="modal-title" id="modal-title">Menang!</div>
+            <div class="modal-msg" id="modal-msg"></div>
+            <div class="modal-answer" id="modal-answer"></div>
+            <button class="modal-btn" id="modal-btn">Ronde Berikutnya</button>
+        </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script>
+        // =============================================
+        // ARRAY KATA — nama permainan tradisional
+        // =============================================
+        let daftarKata = [
+            "GOBAK SODOR",   // 0
+            "ENGKLEK",       // 1
+            "BENTENGAN",     // 2
+            "CONGKLAK",      // 3
+            "PETAK UMPET",   // 4
+            "LOMPAT TALI",   // 5
+            "KELERENG",      // 6
+            "LAYANG LAYANG", // 7
+            "BAKIAK",        // 8
+            "EGRANG",        // 9
+            "GASING",        // 10
+            "ULAR NAGA",     // 11
+            "BALAP KARUNG",  // 12
+            "TARIK TAMBANG", // 13
+        ];
+
+        // =============================================
+        // ARRAY SOAL — clue gampang, index sama
+        // =============================================
+        let daftarSoal = [
+            "Permainan di lapangan, ada yang jaga garis dan ada yang berusaha melewatinya", // 0
+            "Permainan loncat-loncatan di kotak yang digambar di tanah pakai satu kaki",    // 1
+            "Permainan dua tim, tugasnya menyentuh markas lawan tanpa ketangkap",           // 2
+            "Permainan papan kayu berlubang, mainnya pindah-pindahin biji ke lubang",       // 3
+            "Satu orang tutup mata dan hitung, yang lain lari sembunyi",                    // 4
+            "Permainan loncat-loncatan melewati karet yang direntangkan",                   // 5
+            "Permainan pakai bola kaca kecil-kecil, diadu atau ditembak",                   // 6
+            "Benda yang diterbangkan ke langit pakai benang panjang saat angin kencang",    // 7
+            "Lomba jalan pakai sandal kayu panjang, biasanya dimainkan rame-rame",          // 8
+            "Permainan jalan pakai dua bambu panjang sebagai pengganti kaki",               // 9
+            "Benda kayu atau bambu yang diputar di tanah, menang kalau putarannya paling lama", // 10
+            "Permainan anak berbaris sambil nyanyi, ada yang jadi kepala dan ekor naga",    // 11
+            "Lomba lari sambil kedua kaki masuk ke dalam karung",                           // 12
+            "Dua tim tarik tali, yang berhasil menarik lawan melewati garis tengah menang", // 13
+        ];
+
+        // =============================================
+        // STATE GAME
+        // =============================================
+        let state = {
+            indeks: 0,
+            kata: [],
+            jawaban: [],
+            guessed: [],
+            kesempatan: 5,
+            skor: 0,
+            ronde: 1,
+            active: true,
+            usedIndices: []
+        };
+
+        // =============================================
+        // PILIH INDEKS ACAK (tidak mengulang)
+        // =============================================
+        function acakIndeks() {
+            if (state.usedIndices.length >= daftarKata.length) state.usedIndices = [];
+            let idx;
+            do { idx = Math.floor(Math.random() * daftarKata.length); }
+            while (state.usedIndices.includes(idx));
+            state.usedIndices.push(idx);
+            return idx;
+        }
+
+        // =============================================
+        // INISIALISASI RONDE BARU
+        // =============================================
+        function initRonde() {
+            // Pilih kata acak
+            state.indeks = acakIndeks();
+
+            // Ubah kata jadi array huruf
+            state.kata = daftarKata[state.indeks].toUpperCase().split('');
+
+            // Buat array jawaban, isi awal dengan '_'
+            state.jawaban = [];
+            for (let i = 0; i < state.kata.length; i++) {
+                state.jawaban[i] = '_';
+            }
+
+            state.guessed = [];
+            state.kesempatan = 5;
+            state.active = true;
+
+            document.getElementById('letter-input').disabled = false;
+            document.getElementById('tebak-btn').disabled = false;
+            document.getElementById('letter-input').focus();
+
+            renderRondeBaru();
+        }
+
+        // =============================================
+        // RENDER TAMPILAN
+        // =============================================
+        function render(prevKesempatan) {
+            document.getElementById('clue-text').textContent = daftarSoal[state.indeks];
+            document.getElementById('ronde-num').textContent = state.ronde;
+            document.getElementById('kesempatan-num').textContent = state.kesempatan;
+
+            // Skor dengan animasi bump
+            const skorEl = document.getElementById('skor-num');
+            if (skorEl.textContent !== String(state.skor)) {
+                skorEl.textContent = state.skor;
+                skorEl.classList.remove('score-bump');
+                void skorEl.offsetWidth;
+                skorEl.classList.add('score-bump');
+                setTimeout(() => skorEl.classList.remove('score-bump'), 400);
+            }
+
+            // Kotak huruf
+            const blanksRow = document.getElementById('blanks-row');
+            blanksRow.innerHTML = '';
+            for (let i = 0; i < state.kata.length; i++) {
+                const cell = document.createElement('div');
+                const terbuka = state.jawaban[i] !== '_';
+                const adaSpasi = state.kata[i] === ' ';
+
+                cell.className = 'blank-cell' + (terbuka ? ' revealed' : '');
+                cell.id = 'cell-' + i;
+                cell.style.animationDelay = (i * 0.04) + 's';
+
+                if (adaSpasi) {
+                    cell.style.borderBottom = 'none';
+                    cell.style.minWidth = '16px';
+                } else {
+                    cell.textContent = terbuka ? state.jawaban[i] : '';
+                }
+                blanksRow.appendChild(cell);
+            }
+
+            // Hati
+            const heartsRow = document.getElementById('hearts-row');
+            heartsRow.innerHTML = '';
+            for (let i = 0; i < 5; i++) {
+                const h = document.createElement('span');
+                const isLost = i >= state.kesempatan;
+                const wasJustLost = isLost && prevKesempatan !== undefined && i >= prevKesempatan && prevKesempatan !== state.kesempatan;
+                h.className = 'heart' + (isLost && !wasJustLost ? ' lost' : '') + (wasJustLost ? ' losing' : '');
+                h.textContent = '❤️';
+                heartsRow.appendChild(h);
+            }
+
+            // Riwayat huruf
+            const pills = document.getElementById('history-pills');
+            pills.innerHTML = '';
+            for (let i = 0; i < state.guessed.length; i++) {
+                const p = document.createElement('span');
+                p.className = 'pill ' + (state.guessed[i].hit ? 'hit' : 'miss');
+                p.textContent = state.guessed[i].huruf;
+                pills.appendChild(p);
+            }
+        }
+
+        function renderRondeBaru() {
+            const clueEl = document.getElementById('clue-text');
+            clueEl.classList.remove('clue-in');
+            void clueEl.offsetWidth;
+            clueEl.classList.add('clue-in');
+            render();
+        }
+
+        // =============================================
+        // FUNGSI TEBAK
+        // =============================================
+        function tebak() {
+            const inp = document.getElementById('letter-input');
+            const huruf = inp.value.toUpperCase().trim();
+            inp.value = '';
+            inp.focus();
+
+            if (!huruf || !/^[A-Z]$/.test(huruf)) return;
+            if (!state.active) return;
+
+            // Cek sudah pernah ditebak
+            if (state.guessed.find(g => g.huruf === huruf)) {
+                showToast('Huruf "' + huruf + '" sudah pernah ditebak!');
+                return;
+            }
+
+            // Cari posisi huruf di dalam kata
+            const posisi = [];
+            for (let i = 0; i < state.kata.length; i++) {
+                if (state.kata[i] === huruf) posisi.push(i);
+            }
+
+            const hit = posisi.length > 0;
+            state.guessed.push({ huruf, hit });
+
+            if (hit) {
+                // Buka huruf yang benar
+                for (let i = 0; i < posisi.length; i++) {
+                    state.jawaban[posisi[i]] = huruf;
+                }
+                render();
+                for (let i = 0; i < posisi.length; i++) {
+                    const cell = document.getElementById('cell-' + posisi[i]);
+                    if (cell) { cell.classList.remove('revealed'); void cell.offsetWidth; cell.classList.add('revealed'); }
+                }
+            } else {
+                // Kurangi kesempatan
+                const prev = state.kesempatan;
+                state.kesempatan--;
+                render(prev);
+                document.querySelectorAll('.blank-cell:not(.revealed)').forEach(c => {
+                    c.classList.add('shake');
+                    setTimeout(() => c.classList.remove('shake'), 400);
+                });
+            }
+
+            // Cek menang: semua huruf terbuka (kecuali spasi)
+            let semuaTerbuka = true;
+            for (let i = 0; i < state.jawaban.length; i++) {
+                if (state.kata[i] !== ' ' && state.jawaban[i] === '_') {
+                    semuaTerbuka = false;
+                    break;
+                }
+            }
+
+            if (semuaTerbuka) {
+                const bonus = state.kesempatan * 10 + 10;
+                state.skor += bonus;
+                state.active = false;
+                document.getElementById('letter-input').disabled = true;
+                document.getElementById('tebak-btn').disabled = true;
+                render();
+                setTimeout(() => showModal('🎉', 'Jawaban Betul!', `+${bonus} poin! Sisa kesempatan: ${state.kesempatan}`, daftarKata[state.indeks], true), 400);
+                return;
+            }
+
+            // Cek kalah: kesempatan habis
+            if (state.kesempatan <= 0) {
+                state.active = false;
+                document.getElementById('letter-input').disabled = true;
+                document.getElementById('tebak-btn').disabled = true;
+                render();
+                setTimeout(() => showModal('💀', 'Game Over!', 'Yah, kesempatanmu habis! Jawabannya adalah:', daftarKata[state.indeks], false), 600);
+            }
+        }
+
+        // =============================================
+        // MODAL
+        // =============================================
+        function showModal(icon, title, msg, answer, lanjut) {
+            document.getElementById('modal-icon').textContent = icon;
+            document.getElementById('modal-title').textContent = title;
+            document.getElementById('modal-msg').textContent = msg;
+            document.getElementById('modal-answer').textContent = answer;
+            document.getElementById('modal-btn').textContent = lanjut ? 'Ronde Berikutnya ▶' : 'Coba Lagi';
+            document.getElementById('modal-btn').onclick = () => {
+                document.getElementById('modal-overlay').classList.remove('visible');
+                if (lanjut) state.ronde++;
+                setTimeout(initRonde, 200);
+            };
+            document.getElementById('modal-overlay').classList.add('visible');
+        }
+
+        // =============================================
+        // TOAST
+        // =============================================
+        function showToast(msg) {
+            const t = document.getElementById('toast');
+            t.textContent = msg;
+            t.classList.add('show');
+            clearTimeout(t._timeout);
+            t._timeout = setTimeout(() => t.classList.remove('show'), 2000);
+        }
+
+        // =============================================
+        // EVENT LISTENER
+        // =============================================
+        document.getElementById('tebak-btn').addEventListener('click', tebak);
+        document.getElementById('letter-input').addEventListener('keydown', e => { if (e.key === 'Enter') tebak(); });
+
+        // =============================================
+        // MULAI GAME!
+        // =============================================
+        initRonde();
+    </script>
+</body>
+
+</html>
