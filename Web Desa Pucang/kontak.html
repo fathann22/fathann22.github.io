@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Kontak — Desa Pucang</title>
+    <link rel="stylesheet" href="style.css" />
+    <style>
+        /* ── KONTAK INFO CARDS ── */
+        .kontak-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 32px;
+            margin-bottom: 48px;
+        }
+
+        .kontak-info-card {
+            background: var(--putih);
+            border: 1.5px solid var(--abu-muda);
+            border-radius: var(--radius-lg);
+            padding: 32px;
+        }
+
+        .kontak-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 16px;
+            padding: 16px 0;
+            border-bottom: 1px solid var(--abu-muda);
+        }
+
+        .kontak-item:last-child {
+            border-bottom: none;
+        }
+
+        .kontak-icon {
+            width: 44px;
+            height: 44px;
+            background: rgba(45, 122, 79, .1);
+            border-radius: var(--radius-sm);
+            display: grid;
+            place-items: center;
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+
+        .kontak-item-label {
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: .08em;
+            text-transform: uppercase;
+            color: var(--abu);
+            margin-bottom: 4px;
+        }
+
+        .kontak-item-value {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--gelap);
+            line-height: 1.5;
+        }
+
+        .kontak-item-value.placeholder {
+            color: var(--abu);
+            font-weight: 400;
+            font-style: italic;
+        }
+
+        /* Jam Operasional */
+        .jam-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 20px;
+        }
+
+        .jam-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 13px;
+            padding: 8px 12px;
+            background: var(--krem);
+            border-radius: var(--radius-sm);
+        }
+
+        .jam-row .hari {
+            color: var(--gelap);
+            font-weight: 600;
+        }
+
+        .jam-row .waktu {
+            color: var(--hijau);
+            font-weight: 700;
+        }
+
+        .jam-row .libur {
+            color: #ef4444;
+            font-weight: 700;
+        }
+
+        /* ── FORM KONTAK & PENGADUAN ── */
+        .form-section {
+            background: var(--putih);
+            border: 1.5px solid var(--abu-muda);
+            border-radius: var(--radius-lg);
+            padding: 32px;
+            margin-bottom: 48px;
+        }
+
+        .form-tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 28px;
+            border-bottom: 2px solid var(--abu-muda);
+            padding-bottom: 0;
+        }
+
+        .form-tab {
+            padding: 10px 20px;
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--abu);
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            margin-bottom: -2px;
+            transition: var(--transition);
+            background: none;
+            border-top: none;
+            border-left: none;
+            border-right: none;
+            font-family: var(--font-body);
+        }
+
+        .form-tab:hover {
+            color: var(--hijau);
+        }
+
+        .form-tab.active {
+            color: var(--hijau);
+            border-bottom-color: var(--hijau);
+        }
+
+        .form-panel {
+            display: none;
+        }
+
+        .form-panel.active {
+            display: block;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--gelap);
+            margin-bottom: 6px;
+        }
+
+        .form-group label .required {
+            color: #ef4444;
+            margin-left: 2px;
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 11px 14px;
+            border: 1.5px solid var(--abu-muda);
+            border-radius: var(--radius-sm);
+            font-size: 14px;
+            font-family: var(--font-body);
+            color: var(--gelap);
+            background: var(--putih);
+            transition: var(--transition);
+            outline: none;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            border-color: var(--hijau);
+            box-shadow: 0 0 0 3px rgba(45, 122, 79, .1);
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 120px;
+        }
+
+        .form-submit {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--hijau);
+            color: var(--putih);
+            font-family: var(--font-body);
+            font-size: 14px;
+            font-weight: 700;
+            padding: 12px 28px;
+            border-radius: var(--radius-sm);
+            border: none;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .form-submit:hover {
+            background: var(--hijau-tua);
+            transform: translateY(-1px);
+        }
+
+        /* Success message */
+        .form-success {
+            display: none;
+            background: rgba(45, 122, 79, .08);
+            border: 1.5px solid rgba(45, 122, 79, .25);
+            border-radius: var(--radius-md);
+            padding: 20px 24px;
+            text-align: center;
+            margin-top: 16px;
+        }
+
+        .form-success .icon {
+            font-size: 32px;
+            margin-bottom: 8px;
+        }
+
+        .form-success p {
+            font-size: 14px;
+            color: var(--hijau-tua);
+            font-weight: 600;
+        }
+
+        .form-success small {
+            color: var(--abu);
+            font-size: 13px;
+        }
+
+        /* ── PETA ── */
+        .peta-section {
+            margin-bottom: 48px;
+        }
+
+        .peta-box {
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            border: 1.5px solid var(--abu-muda);
+        }
+
+        .peta-placeholder-lg {
+            background: linear-gradient(135deg, var(--hijau-tua), var(--hijau));
+            height: 320px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            color: rgba(255, 255, 255, .8);
+        }
+
+        .peta-placeholder-lg .icon {
+            font-size: 48px;
+        }
+
+        .peta-placeholder-lg span {
+            font-size: 15px;
+            font-weight: 600;
+        }
+
+        .peta-placeholder-lg a {
+            background: rgba(255, 255, 255, .15);
+            border: 1px solid rgba(255, 255, 255, .3);
+            color: var(--putih);
+            padding: 8px 20px;
+            border-radius: 99px;
+            font-size: 13px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .peta-placeholder-lg a:hover {
+            background: rgba(255, 255, 255, .25);
+        }
+
+        @media (max-width: 768px) {
+            .kontak-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- ══ NAVBAR ══ -->
+    <nav class="navbar">
+        <div class="navbar-inner">
+            <a href="index.html" class="nav-brand">
+                <div class="nav-logo">🏡</div>
+                <div class="nav-title-text">
+                    Desa Pucang
+                    <span>Kec. Bawang · Banjarnegara</span>
+                </div>
+            </a>
+            <div class="nav-links">
+                <a href="index.html">Beranda</a>
+                <a href="profil.html">Profil</a>
+                <a href="lurah.html">Kapdes</a>
+                <a href="pengurus.html">Pengurus</a>
+                <a href="statistik.html">Statistik</a>
+                <a href="umkm.html">UMKM</a>
+                <a href="galeri.html">Galeri</a>
+                <a href="kontak.html" class="active">Kontak</a>
+            </div>
+            <div class="nav-toggle" id="navToggle">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="nav-mobile" id="navMobile">
+            <a href="index.html">Beranda</a>
+            <a href="profil.html">Profil</a>
+            <a href="lurah.html">Kapdes</a>
+            <a href="pengurus.html">Pengurus</a>
+            <a href="statistik.html">Statistik</a>
+            <a href="umkm.html">UMKM</a>
+            <a href="galeri.html">Galeri</a>
+            <a href="kontak.html" class="active">Kontak</a>
+        </div>
+    </nav>
+
+    <!-- ══ PAGE HERO ══ -->
+    <div class="page-hero">
+        <div class="page-hero-content">
+            <div class="page-hero-badge">📞 Kontak</div>
+            <h1>Hubungi Desa Pucang</h1>
+            <p>Sampaikan pertanyaan, saran, atau pengaduan kamu kepada perangkat Desa Pucang.</p>
+            <div class="breadcrumb">
+                <a href="index.html">Beranda</a>
+                <span class="sep">›</span>
+                <span>Kontak</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <div class="container">
+
+            <!-- ── Info Kontak & Jam Operasional ── -->
+            <div class="kontak-grid fade-up">
+
+                <!-- Kiri: Info Kontak -->
+                <div class="kontak-info-card">
+                    <div class="section-label">Informasi Kontak</div>
+                    <h2 class="section-title" style="margin-bottom:8px;">Kantor Desa Pucang</h2>
+
+                    <div class="kontak-item">
+                        <div class="kontak-icon">📍</div>
+                        <div>
+                            <div class="kontak-item-label">Alamat</div>
+                            <!-- ISI DATA: alamat lengkap kantor desa -->
+                            <div class="kontak-item-value">RT 05 / RW 02, Desa Pucang, Kecamatan Bawang, Kabupaten
+                                Banjarnegara</div>
+                        </div>
+                    </div>
+
+                    <div class="kontak-item">
+                        <div class="kontak-icon">📱</div>
+                        <div>
+                            <div class="kontak-item-label">WhatsApp / Telepon</div>
+                            <!-- ISI DATA: nomor WA/HP kantor desa -->
+                            <div>+62 822-3332-0084</div>
+                        </div>
+                    </div>
+
+                    <div class="kontak-item">
+                        <div class="kontak-icon">✉️</div>
+                        <div>
+                            <div class="kontak-item-label">Email</div>
+                            <!-- ISI DATA: email desa jika ada -->
+                            <div class="kontak-item-value placeholder">-</div>
+                        </div>
+                    </div>
+
+                    <div class="kontak-item">
+                        <div class="kontak-icon">🌐</div>
+                        <div>
+                            <div class="kontak-item-label">Media Sosial</div>
+                            <!-- ISI DATA: akun medsos desa jika ada -->
+                            <div class="kontak-item-value placeholder">-</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Kanan: Jam Operasional -->
+                <div class="kontak-info-card">
+                    <div class="section-label">Jam Operasional</div>
+                    <h2 class="section-title" style="margin-bottom:8px;">Pelayanan Kantor</h2>
+                    <p style="font-size:13px; color:var(--abu); margin-bottom:4px;">Kantor Desa Pucang melayani
+                        masyarakat pada hari dan jam berikut:</p>
+
+                    <div class="jam-grid">
+                        <!-- ISI DATA: sesuaikan jam dengan jadwal kantor desa yang sebenarnya -->
+                        <div class="jam-row">
+                            <span class="hari">Senin – Kamis</span>
+                            <span class="waktu">08.00 – 14.00</span>
+                        </div>
+                        <div class="jam-row">
+                            <span class="hari">Jumat</span>
+                            <span class="waktu">08.00 – 11.00</span>
+                        </div>
+                        <div class="jam-row">
+                            <span class="hari">Sabtu</span>
+                            <span class="libur">Tutup</span>
+                        </div>
+                        <div class="jam-row">
+                            <span class="hari">Minggu</span>
+                            <span class="libur">Tutup</span>
+                        </div>
+                    </div>
+
+                    <p style="font-size:12px; color:var(--abu); margin-top:16px;">
+                        ⚠️ Jam pelayanan dapat berubah pada hari libur nasional.
+                    </p>
+                </div>
+
+            </div>
+
+            <!-- ── Peta Lokasi ── -->
+            <div class="peta-section fade-up-1">
+                <div class="section-label">Lokasi</div>
+                <h2 class="section-title" style="margin-bottom:20px;">Lokasi Kantor Desa</h2>
+                <div class="peta-box">
+                    <!--
+            ISI DATA: ganti div.peta-placeholder-lg ini dengan iframe Google Maps
+            Cara: Google Maps → cari kantor desa → Share → Embed a map → copy iframe
+            Contoh:
+            <iframe src="https://www.google.com/maps/embed?pb=..."
+              width="100%" height="320" style="border:0;" allowfullscreen="" loading="lazy">
+            </iframe>
+          -->
+                    <iframe
+                        src="https://www.google.com/maps/embed?pb=!4v1779667694723!6m8!1m7!1sJT7dnnRHBd9HaMTXeB4Nsw!2m2!1d-7.398218879556705!2d109.653938383033!3f7.705243964091267!4f-1.3510193032265931!5f0.7820865974627469"
+                        width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy"
+                        referrerpolicy="no-referrer-when-downgrade"></iframe>
+                </div>
+            </div>
+
+            <!-- ── Form Kontak & Pengaduan ── -->
+            <div class="form-section fade-up-2">
+                <div class="section-label">Formulir</div>
+                <h2 class="section-title" style="margin-bottom:4px;">Kirim Pesan atau Pengaduan</h2>
+                <p style="font-size:13px; color:var(--abu); margin-bottom:24px;">Isi formulir di bawah ini, perangkat
+                    desa akan merespons secepatnya.</p>
+
+                <!-- Tab -->
+                <div class="form-tabs">
+                    <button class="form-tab active" onclick="switchTab('kontak')">💬 Pesan / Pertanyaan</button>
+                    <button class="form-tab" onclick="switchTab('pengaduan')">📢 Pengaduan</button>
+                </div>
+
+                <!-- Panel: Pesan Biasa -->
+                <div class="form-panel active" id="panel-kontak">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Nama Lengkap <span class="required">*</span></label>
+                            <input type="text" placeholder="Masukkan nama lengkap kamu" id="kontak-nama">
+                        </div>
+                        <div class="form-group">
+                            <label>No. WhatsApp / HP</label>
+                            <input type="tel" placeholder="Contoh: 08123456789" id="kontak-hp">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Subjek <span class="required">*</span></label>
+                        <input type="text" placeholder="Topik pesan kamu" id="kontak-subjek">
+                    </div>
+                    <div class="form-group">
+                        <label>Pesan <span class="required">*</span></label>
+                        <textarea placeholder="Tulis pesan atau pertanyaanmu di sini..." id="kontak-pesan"></textarea>
+                    </div>
+                    <button class="form-submit" onclick="kirimPesan('kontak')">
+                        📨 Kirim Pesan
+                    </button>
+                    <div class="form-success" id="success-kontak">
+                        <div class="icon">✅</div>
+                        <p>Pesan berhasil dikirim!</p>
+                        <small>Terima kasih, perangkat desa akan segera merespons pesanmu.</small>
+                    </div>
+                </div>
+
+                <!-- Panel: Pengaduan -->
+                <div class="form-panel" id="panel-pengaduan">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Nama Pelapor <span class="required">*</span></label>
+                            <input type="text" placeholder="Nama lengkap (boleh anonim)" id="aduan-nama">
+                        </div>
+                        <div class="form-group">
+                            <label>No. WhatsApp / HP</label>
+                            <input type="tel" placeholder="Untuk tindak lanjut (opsional)" id="aduan-hp">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Kategori Pengaduan <span class="required">*</span></label>
+                        <select id="aduan-kategori">
+                            <option value="">-- Pilih kategori --</option>
+                            <option>Infrastruktur (jalan, jembatan, dll)</option>
+                            <option>Pelayanan Publik</option>
+                            <option>Keamanan & Ketertiban</option>
+                            <option>Lingkungan & Kebersihan</option>
+                            <option>Sosial & Kemasyarakatan</option>
+                            <option>Lainnya</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Lokasi Kejadian</label>
+                        <input type="text" placeholder="Contoh: RT 02 / RW 01, Dusun Gembirit" id="aduan-lokasi">
+                    </div>
+                    <div class="form-group">
+                        <label>Uraian Pengaduan <span class="required">*</span></label>
+                        <textarea placeholder="Jelaskan pengaduanmu secara detail..." id="aduan-uraian"
+                            style="min-height:140px;"></textarea>
+                    </div>
+                    <button class="form-submit" onclick="kirimPesan('pengaduan')">
+                        📢 Kirim Pengaduan
+                    </button>
+                    <div class="form-success" id="success-pengaduan">
+                        <div class="icon">✅</div>
+                        <p>Pengaduan berhasil dikirim!</p>
+                        <small>Terima kasih telah melapor. Perangkat desa akan menindaklanjuti pengaduanmu.</small>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+    <!-- ══ FOOTER ══ -->
+    <footer>
+        <div class="footer-top">
+            <div class="footer-brand">
+                <div class="footer-brand-name">🏡 Desa Pucang</div>
+                <p>Website resmi Desa Pucang, Kecamatan Bawang, Kabupaten Banjarnegara. Melayani masyarakat dengan
+                    transparan dan informatif.</p>
+            </div>
+            <div class="footer-col">
+                <h4>Halaman</h4>
+                <ul>
+                    <li><a href="index.html">Beranda</a></li>
+                    <li><a href="profil.html">Profil Desa</a></li>
+                    <li><a href="lurah.html">Kapdes</a></li>
+                    <li><a href="pengurus.html">Pengurus</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4>Lainnya</h4>
+                <ul>
+                    <li><a href="statistik.html">Statistik</a></li>
+                    <li><a href="umkm.html">UMKM</a></li>
+                    <li><a href="galeri.html">Galeri</a></li>
+                    <li><a href="kontak.html">Kontak</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4>Dusun</h4>
+                <ul>
+                    <li><a href="gembirit.html">Gembirit</a></li>
+                    <li><a href="#">Sidakarsa <span style="font-size:10px;opacity:.5">(segera)</span></a></li>
+                    <li><a href="#">Blater <span style="font-size:10px;opacity:.5">(segera)</span></a></li>
+                    <li><a href="#">Kemusuk <span style="font-size:10px;opacity:.5">(segera)</span></a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <span>© 2026 Desa Pucang · Kec. Bawang · Banjarnegara</span>
+            <span>Made with Muhamad Fathan A A — X PPLG 1</span>
+        </div>
+    </footer>
+
+    <script src="main.js"></script>
+    <script>
+        // ── TAB SWITCH ──
+        function switchTab(tab) {
+            document.querySelectorAll('.form-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.form-panel').forEach(p => p.classList.remove('active'));
+            document.getElementById('panel-' + tab).classList.add('active');
+            event.target.classList.add('active');
+            // hide success jika ganti tab
+            document.querySelectorAll('.form-success').forEach(s => s.style.display = 'none');
+        }
+
+        // ── SUBMIT FORM (simulasi — belum ke server) ──
+        function kirimPesan(type) {
+            // Validasi sederhana
+            let valid = true;
+            if (type === 'kontak') {
+                if (!document.getElementById('kontak-nama').value.trim()) valid = false;
+                if (!document.getElementById('kontak-subjek').value.trim()) valid = false;
+                if (!document.getElementById('kontak-pesan').value.trim()) valid = false;
+            } else {
+                if (!document.getElementById('aduan-nama').value.trim()) valid = false;
+                if (!document.getElementById('aduan-kategori').value) valid = false;
+                if (!document.getElementById('aduan-uraian').value.trim()) valid = false;
+            }
+
+            if (!valid) {
+                alert('Harap isi semua kolom yang wajib diisi (*)');
+                return;
+            }
+
+            // Tampilkan pesan sukses
+            document.getElementById('success-' + type).style.display = 'block';
+
+            // Reset form
+            if (type === 'kontak') {
+                document.getElementById('kontak-nama').value = '';
+                document.getElementById('kontak-hp').value = '';
+                document.getElementById('kontak-subjek').value = '';
+                document.getElementById('kontak-pesan').value = '';
+            } else {
+                document.getElementById('aduan-nama').value = '';
+                document.getElementById('aduan-hp').value = '';
+                document.getElementById('aduan-kategori').value = '';
+                document.getElementById('aduan-lokasi').value = '';
+                document.getElementById('aduan-uraian').value = '';
+            }
+
+            // Scroll ke success message
+            document.getElementById('success-' + type).scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+    </script>
+</body>
+
+</html>

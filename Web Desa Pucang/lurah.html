@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Kepala Desa — Desa Pucang</title>
+    <link rel="stylesheet" href="style.css" />
+    <style>
+        .lurah-hero-card {
+            background: var(--putih);
+            border: 1.5px solid var(--abu-muda);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            margin-bottom: 40px;
+            display: grid;
+            grid-template-columns: 320px 1fr;
+        }
+
+        .lurah-foto-side {
+            background: linear-gradient(160deg, var(--hijau-tua), var(--hijau));
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 32px;
+            gap: 16px;
+            text-align: center;
+        }
+
+        .lurah-foto {
+            width: 160px;
+            height: 160px;
+            border-radius: 50%;
+            border: 4px solid var(--emas);
+            background: rgba(255, 255, 255, .15);
+            display: grid;
+            place-items: center;
+            font-size: 64px;
+            overflow: hidden;
+        }
+
+        .lurah-foto img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 50%;
+        }
+
+        .lurah-nama-hero {
+            font-family: var(--font-display);
+            font-size: 22px;
+            color: var(--putih);
+        }
+
+        .lurah-jabatan-hero {
+            font-size: 12px;
+            color: var(--emas-muda);
+            font-weight: 700;
+            letter-spacing: .1em;
+            text-transform: uppercase;
+        }
+
+        .lurah-periode {
+            background: rgba(255, 255, 255, .1);
+            border: 1px solid rgba(255, 255, 255, .2);
+            border-radius: 99px;
+            padding: 5px 16px;
+            font-size: 12px;
+            color: rgba(255, 255, 255, .75);
+        }
+
+        .lurah-info-side {
+            padding: 36px;
+        }
+
+        .lurah-bio {
+            font-size: 14px;
+            color: var(--abu);
+            line-height: 1.9;
+            margin-bottom: 24px;
+        }
+
+        .info-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .info-table tr {
+            border-bottom: 1px solid var(--abu-muda);
+        }
+
+        .info-table tr:last-child {
+            border-bottom: none;
+        }
+
+        .info-table td {
+            padding: 10px 4px;
+            font-size: 13px;
+        }
+
+        .info-table td:first-child {
+            color: var(--abu);
+            width: 130px;
+        }
+
+        .info-table td:last-child {
+            font-weight: 600;
+            color: var(--gelap);
+        }
+
+        .info-table td.ph {
+            color: var(--abu);
+            font-weight: 400;
+            font-style: italic;
+        }
+
+        /* Sambutan */
+        .sambutan-card {
+            background: var(--krem);
+            border: 1.5px solid var(--abu-muda);
+            border-radius: var(--radius-lg);
+            padding: 40px;
+            margin-bottom: 40px;
+            position: relative;
+        }
+
+        .sambutan-quote {
+            font-size: 80px;
+            color: var(--hijau-muda);
+            opacity: .3;
+            position: absolute;
+            top: 16px;
+            left: 28px;
+            font-family: serif;
+            line-height: 1;
+        }
+
+        .sambutan-text {
+            font-size: 15px;
+            color: var(--gelap);
+            line-height: 1.9;
+            font-style: italic;
+            position: relative;
+            z-index: 1;
+            padding-left: 24px;
+            border-left: 3px solid var(--hijau);
+            margin-bottom: 20px;
+        }
+
+        .sambutan-sign {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .sambutan-sign-avatar {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--hijau-tua), var(--hijau));
+            border-radius: 50%;
+            display: grid;
+            place-items: center;
+            font-size: 18px;
+        }
+
+        .sambutan-sign-name {
+            font-weight: 700;
+            font-size: 14px;
+            color: var(--gelap);
+        }
+
+        .sambutan-sign-title {
+            font-size: 12px;
+            color: var(--abu);
+        }
+
+        /* Program kerja */
+        .program-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 16px;
+            margin-top: 24px;
+        }
+
+        .program-item {
+            background: var(--putih);
+            border: 1.5px solid var(--abu-muda);
+            border-radius: var(--radius-md);
+            padding: 20px;
+            display: flex;
+            gap: 14px;
+            align-items: flex-start;
+            transition: var(--transition);
+        }
+
+        .program-item:hover {
+            border-color: var(--hijau-muda);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .program-icon {
+            font-size: 28px;
+            flex-shrink: 0;
+        }
+
+        .program-judul {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--gelap);
+            margin-bottom: 4px;
+        }
+
+        .program-desc {
+            font-size: 12px;
+            color: var(--abu);
+            line-height: 1.6;
+        }
+
+        @media (max-width: 768px) {
+            .lurah-hero-card {
+                grid-template-columns: 1fr;
+            }
+
+            .lurah-foto-side {
+                padding: 32px 24px;
+            }
+
+            .lurah-info-side {
+                padding: 24px;
+            }
+
+            .sambutan-card {
+                padding: 28px 24px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- ══ NAVBAR ══ -->
+    <nav class="navbar">
+        <div class="navbar-inner">
+            <a href="index.html" class="nav-brand">
+                <div class="nav-logo">🏡</div>
+                <div class="nav-title-text">
+                    Desa Pucang
+                    <span>Kec. Bawang · Banjarnegara</span>
+                </div>
+            </a>
+            <div class="nav-links">
+                <a href="index.html">Beranda</a>
+                <a href="profil.html">Profil</a>
+                <a href="lurah.html" class="active">Kapdes</a>
+                <a href="pengurus.html">Pengurus</a>
+                <a href="statistik.html">Statistik</a>
+                <a href="umkm.html">UMKM</a>
+                <a href="galeri.html">Galeri</a>
+                <a href="kontak.html">Kontak</a>
+            </div>
+            <div class="nav-toggle" id="navToggle">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="nav-mobile" id="navMobile">
+            <a href="index.html">Beranda</a>
+            <a href="profil.html">Profil</a>
+            <a href="lurah.html" class="active">Kapdes</a>
+            <a href="pengurus.html">Pengurus</a>
+            <a href="statistik.html">Statistik</a>
+            <a href="umkm.html">UMKM</a>
+            <a href="galeri.html">Galeri</a>
+            <a href="kontak.html">Kontak</a>
+        </div>
+    </nav>
+
+    <!-- ══ PAGE HERO ══ -->
+    <div class="page-hero">
+        <div class="page-hero-content">
+            <div class="page-hero-badge">👤 Kepala Desa</div>
+            <h1>Kepala Desa Pucang</h1>
+            <p>Mengenal sosok pemimpin Desa Pucang, Kecamatan Bawang, Kabupaten Banjarnegara.</p>
+            <div class="breadcrumb">
+                <a href="index.html">Beranda</a>
+                <span class="sep">›</span>
+                <span>Kapdes</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <div class="container">
+
+            <!-- ── Profil Kepala Desa ── -->
+            <div class="lurah-hero-card fade-up">
+                <div class="lurah-foto-side">
+                    <div class="lurah-foto">
+                        <!--
+              ISI DATA: ganti emoji 👤 dengan tag <img>
+              Contoh: <img src="foto/pak-toni.jpg" alt="Pak Toni">
+            -->
+                        👤
+                    </div>
+                    <div class="lurah-nama-hero">Toni Dwi Sulistyo, A.Md</div>
+                    <div class="lurah-jabatan-hero">Kepala Desa</div>
+                    <!-- ISI DATA: periode jabatan -->
+                </div>
+
+                <div class="lurah-info-side">
+                    <div class="section-label">Biodata</div>
+                    <h2 class="section-title" style="margin-bottom:14px;">Profil Kepala Desa</h2>
+                    <p class="lurah-bio">
+                        <!-- ISI DATA: narasi singkat tentang kepala desa dari hasil wawancara -->
+                        Pak Toni merupakan Kepala Desa Pucang yang memimpin desa dengan visi menjadikan
+                        Desa Pucang sebagai desa yang maju, mapan, dan baik dari segala aspek.
+                        Beliau berkomitmen untuk terus meningkatkan pelayanan kepada masyarakat dan
+                        mengembangkan potensi desa.
+                    </p>
+                    <table class="info-table">
+                        <tr>
+                            <td>Nama Lengkap</td>
+                            <!-- ISI DATA: nama lengkap kepala desa -->
+                            <td>Toni Dwi Sulistyo, A.Md</td>
+                        </tr>
+                        <tr>
+                            <td>Jabatan</td>
+                            <td>Kepala Desa Pucang</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+            <!-- ── Sambutan ── -->
+            <div class="sambutan-card fade-up-1">
+                <div class="sambutan-quote">"</div>
+                <div class="section-label">Sambutan</div>
+                <h2 class="section-title" style="margin-bottom:20px;">Sambutan Kepala Desa</h2>
+                <div class="sambutan-text">
+                    <!--
+            ISI DATA: sambutan resmi dari kepala desa
+            Bisa didapat dari hasil wawancara atau meminta langsung ke Pak Toni
+          -->
+                    Assalamu'alaikum Warahmatullahi Wabarakatuh.
+                    <br><br>
+                    Puji syukur kami panjatkan ke hadirat Allah SWT atas segala limpahan rahmat dan karunia-Nya
+                    sehingga Desa Pucang dapat terus berkembang dan maju. Kami berkomitmen untuk memberikan
+                    pelayanan terbaik kepada seluruh warga Desa Pucang demi terwujudnya desa yang maju, mapan,
+                    dan baik dari segala aspek.
+                    <br><br>
+                    Kami mengajak seluruh warga untuk bersama-sama membangun desa kita tercinta.
+                    Dengan semangat gotong royong dan kebersamaan, insyaAllah kita dapat mewujudkan
+                    Desa Pucang yang lebih baik untuk generasi mendatang.
+                    <br><br>
+                    Wassalamu'alaikum Warahmatullahi Wabarakatuh.
+                </div>
+                <div class="sambutan-sign">
+                    <div class="sambutan-sign-avatar">👤</div>
+                    <div>
+                        <div class="sambutan-sign-name">Toni Dwi Sulistyo, A.Md</div>
+                        <div class="sambutan-sign-title">Kepala Desa Pucang</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ── Program Kerja ── -->
+            <div class="fade-up-2">
+                <div class="section-label">Program Kerja</div>
+                <h2 class="section-title">Program Unggulan</h2>
+                <p class="section-desc">
+                    <!-- ISI DATA: program kerja dari hasil wawancara -->
+                    Beberapa program kerja prioritas dalam kepemimpinan Kepala Desa Pucang.
+                </p>
+                <div class="program-grid">
+                    <div class="program-item">
+                        <div class="program-icon">🏗️</div>
+                        <div>
+                            <div class="program-judul">Infrastruktur Desa</div>
+                            <div class="program-desc">Peningkatan jalan, jembatan, dan fasilitas umum desa.</div>
+                        </div>
+                    </div>
+                    <div class="program-item">
+                        <div class="program-icon">💼</div>
+                        <div>
+                            <div class="program-judul">Pemberdayaan UMKM</div>
+                            <div class="program-desc">Mendorong pertumbuhan usaha kecil dan menengah warga desa.</div>
+                        </div>
+                    </div>
+                    <div class="program-item">
+                        <div class="program-icon">📚</div>
+                        <div>
+                            <div class="program-judul">Pendidikan & SDM</div>
+                            <div class="program-desc">Peningkatan kualitas sumber daya manusia Desa Pucang.</div>
+                        </div>
+                    </div>
+                    <div class="program-item">
+                        <div class="program-icon">🌱</div>
+                        <div>
+                            <div class="program-judul">Pertanian</div>
+                            <div class="program-desc">Pengembangan sektor pertanian sebagai tulang punggung ekonomi
+                                desa.</div>
+                        </div>
+                    </div>
+                    <!-- ISI DATA: tambah/edit program sesuai data dari wawancara -->
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- ══ FOOTER ══ -->
+    <footer>
+        <div class="footer-top">
+            <div class="footer-brand">
+                <div class="footer-brand-name">🏡 Desa Pucang</div>
+                <p>Website resmi Desa Pucang, Kecamatan Bawang, Kabupaten Banjarnegara.</p>
+            </div>
+            <div class="footer-col">
+                <h4>Halaman</h4>
+                <ul>
+                    <li><a href="index.html">Beranda</a></li>
+                    <li><a href="profil.html">Profil Desa</a></li>
+                    <li><a href="lurah.html">Kapdes</a></li>
+                    <li><a href="pengurus.html">Pengurus</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4>Lainnya</h4>
+                <ul>
+                    <li><a href="statistik.html">Statistik</a></li>
+                    <li><a href="umkm.html">UMKM</a></li>
+                    <li><a href="galeri.html">Galeri</a></li>
+                    <li><a href="kontak.html">Kontak</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4>Dusun</h4>
+                <ul>
+                    <li><a href="gembirit.html">Gembirit</a></li>
+                    <li><a href="#">Sidakarsa <span style="font-size:10px;opacity:.5">(segera)</span></a></li>
+                    <li><a href="#">Blater <span style="font-size:10px;opacity:.5">(segera)</span></a></li>
+                    <li><a href="#">Kemusuk <span style="font-size:10px;opacity:.5">(segera)</span></a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <span>© 2026 Desa Pucang · Kec. Bawang · Banjarnegara</span>
+            <span>Made with Muhamad Fathan A A — X PPLG 1</span>
+        </div>
+    </footer>
+
+    <script src="main.js"></script>
+</body>
+
+</html> 

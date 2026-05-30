@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Pengurus — Desa Pucang</title>
+    <link rel="stylesheet" href="style.css" />
+    <style>
+        /* ── ORG CHART ── */
+        .org-wrap {
+            background: var(--putih);
+            border: 1.5px solid var(--abu-muda);
+            border-radius: var(--radius-lg);
+            padding: 40px 32px;
+            margin-bottom: 40px;
+            overflow-x: auto;
+        }
+
+        .org-tree {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0;
+            min-width: 600px;
+        }
+
+        /* Baris level */
+        .org-level {
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .org-connector-v {
+            width: 2px;
+            height: 36px;
+            background: var(--abu-muda);
+            margin: 0 auto;
+        }
+
+        .org-connector-row {
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+            gap: 20px;
+            position: relative;
+        }
+
+        /* Garis horizontal penghubung antar card */
+        .org-connector-row::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: calc(50% - (var(--row-width, 400px) / 2));
+            width: var(--row-width, 400px);
+            height: 2px;
+            background: var(--abu-muda);
+        }
+
+        .org-col {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .org-col-line {
+            width: 2px;
+            height: 24px;
+            background: var(--abu-muda);
+        }
+
+        /* Card pengurus */
+        .org-card {
+            background: var(--krem);
+            border: 1.5px solid var(--abu-muda);
+            border-radius: var(--radius-md);
+            padding: 16px 20px;
+            text-align: center;
+            width: 160px;
+            transition: var(--transition);
+        }
+
+        .org-card:hover {
+            border-color: var(--hijau-muda);
+            box-shadow: var(--shadow-sm);
+            transform: translateY(-2px);
+        }
+
+        .org-card.level-1 {
+            background: var(--hijau-tua);
+            border-color: var(--hijau-tua);
+            width: 180px;
+        }
+
+        .org-card.level-2 {
+            background: var(--hijau);
+            border-color: var(--hijau);
+        }
+
+        .org-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            display: grid;
+            place-items: center;
+            font-size: 22px;
+            margin: 0 auto 10px;
+            background: rgba(255, 255, 255, .15);
+        }
+
+        .org-card:not(.level-1):not(.level-2) .org-avatar {
+            background: linear-gradient(135deg, var(--hijau-tua), var(--hijau));
+        }
+
+        .org-nama {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--gelap);
+            line-height: 1.3;
+            margin-bottom: 4px;
+        }
+
+        .org-card.level-1 .org-nama,
+        .org-card.level-2 .org-nama {
+            color: var(--putih);
+        }
+
+        .org-jabatan {
+            font-size: 11px;
+            color: var(--abu);
+            line-height: 1.3;
+        }
+
+        .org-card.level-1 .org-jabatan {
+            color: var(--emas-muda);
+        }
+
+        .org-card.level-2 .org-jabatan {
+            color: rgba(255, 255, 255, .75);
+        }
+
+        /* ── DAFTAR PERANGKAT (tabel) ── */
+        .perangkat-section {
+            background: var(--putih);
+            border: 1.5px solid var(--abu-muda);
+            border-radius: var(--radius-lg);
+            padding: 32px;
+            margin-bottom: 40px;
+        }
+
+        .perangkat-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        .perangkat-table thead tr {
+            background: var(--hijau-tua);
+            color: var(--putih);
+        }
+
+        .perangkat-table thead th {
+            padding: 12px 16px;
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: .06em;
+            text-transform: uppercase;
+            text-align: left;
+        }
+
+        .perangkat-table thead th:first-child {
+            border-radius: var(--radius-sm) 0 0 0;
+        }
+
+        .perangkat-table thead th:last-child {
+            border-radius: 0 var(--radius-sm) 0 0;
+        }
+
+        .perangkat-table tbody tr {
+            border-bottom: 1px solid var(--abu-muda);
+            transition: var(--transition);
+        }
+
+        .perangkat-table tbody tr:last-child {
+            border-bottom: none;
+        }
+
+        .perangkat-table tbody tr:hover {
+            background: var(--krem);
+        }
+
+        .perangkat-table td {
+            padding: 13px 16px;
+            font-size: 14px;
+            color: var(--gelap);
+        }
+
+        .perangkat-table td:first-child {
+            color: var(--abu);
+            font-size: 13px;
+            width: 50px;
+            text-align: center;
+        }
+
+        .perangkat-table .jabatan-badge {
+            display: inline-block;
+            background: rgba(45, 122, 79, .1);
+            color: var(--hijau-tua);
+            font-size: 12px;
+            font-weight: 600;
+            padding: 3px 10px;
+            border-radius: 99px;
+        }
+
+        .perangkat-table .placeholder-data {
+            color: var(--abu);
+            font-style: italic;
+        }
+
+        @media (max-width: 768px) {
+            .org-wrap {
+                padding: 24px 16px;
+            }
+
+            .perangkat-section {
+                padding: 20px 16px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- ══ NAVBAR ══ -->
+    <nav class="navbar">
+        <div class="navbar-inner">
+            <a href="index.html" class="nav-brand">
+                <div class="nav-logo">🏡</div>
+                <div class="nav-title-text">
+                    Desa Pucang
+                    <span>Kec. Bawang · Banjarnegara</span>
+                </div>
+            </a>
+            <div class="nav-links">
+                <a href="index.html">Beranda</a>
+                <a href="profil.html">Profil</a>
+                <a href="lurah.html">Kapdes</a>
+                <a href="pengurus.html" class="active">Pengurus</a>
+                <a href="statistik.html">Statistik</a>
+                <a href="umkm.html">UMKM</a>
+                <a href="galeri.html">Galeri</a>
+                <a href="kontak.html">Kontak</a>
+            </div>
+            <div class="nav-toggle" id="navToggle">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="nav-mobile" id="navMobile">
+            <a href="index.html">Beranda</a>
+            <a href="profil.html">Profil</a>
+            <a href="lurah.html">Kapdes</a>
+            <a href="pengurus.html" class="active">Pengurus</a>
+            <a href="statistik.html">Statistik</a>
+            <a href="umkm.html">UMKM</a>
+            <a href="galeri.html">Galeri</a>
+            <a href="kontak.html">Kontak</a>
+        </div>
+    </nav>
+
+    <!-- ══ PAGE HERO ══ -->
+    <div class="page-hero">
+        <div class="page-hero-content">
+            <div class="page-hero-badge">👥 Pengurus</div>
+            <h1>Struktur Organisasi</h1>
+            <p>Perangkat Desa Pucang yang bertugas melayani masyarakat Kecamatan Bawang, Kabupaten Banjarnegara.</p>
+            <div class="breadcrumb">
+                <a href="index.html">Beranda</a>
+                <span class="sep">›</span>
+                <span>Pengurus</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <div class="container">
+
+            <!-- ── Bagan Org Chart ── -->
+            <div class="fade-up">
+                <div class="section-label">Bagan Organisasi</div>
+                <h2 class="section-title" style="margin-bottom:24px;">Struktur Perangkat Desa Pucang</h2>
+            </div>
+
+            <div class="org-wrap fade-up">
+                <div class="org-tree">
+
+                    <!-- Level 1: Kepala Desa -->
+                    <div class="org-level">
+                        <div class="org-card level-1">
+                            <div class="org-avatar">👤</div>
+                            <!-- ISI DATA: nama kepala desa -->
+                            <div class="org-nama">Toni Dwi Sulistyo, A.Md Dwi Sulistyo</div>
+                            <div class="org-jabatan">Kepala Desa</div>
+                        </div>
+                    </div>
+
+                    <div class="org-connector-v"></div>
+
+                    <!-- Level 2: Sekretaris Desa -->
+                    <div class="org-level">
+                        <div class="org-card level-2">
+                            <div class="org-avatar">👤</div>
+
+                            <div class="org-nama">Andi Sujatmiko, S.Kom</div>
+                            <div class="org-jabatan">Sekretaris Desa</div>
+                        </div>
+                    </div>
+
+                    <div class="org-connector-v"></div>
+
+                    <!-- Level 3: Kaur-kaur -->
+                    <div class="org-level">
+
+                        <div class="org-col">
+                            <div class="org-col-line"></div>
+                            <div class="org-card">
+                                <div class="org-avatar">👤</div>
+                                <div class="org-nama">Eko Apriantoro</div>
+                                <div class="org-jabatan">Kaur Keuangan</div>
+                            </div>
+                        </div>
+
+                        <div class="org-col">
+                            <div class="org-col-line"></div>
+                            <div class="org-card">
+                                <div class="org-avatar">👤</div>
+                                <div class="org-nama">Harsono</div>
+                                <div class="org-jabatan">Kaur TU & Umum</div>
+                            </div>
+                        </div>
+
+                        <div class="org-col">
+                            <div class="org-col-line"></div>
+                            <div class="org-card">
+                                <div class="org-avatar">👤</div>
+                                <div class="org-nama">Kurniawan Noviandri</div>
+                                <div class="org-jabatan">Kaur Perencanaan</div>
+                            </div>
+                        </div>
+
+                        <div class="org-col">
+                            <div class="org-col-line"></div>
+                            <div class="org-card">
+                                <div class="org-avatar">👤</div>
+                                <div class="org-nama">Wagino</div>
+                                <div class="org-jabatan">Kasi Pemerintahan</div>
+                            </div>
+                        </div>
+
+                        <div class="org-col">
+                            <div class="org-col-line"></div>
+                            <div class="org-card">
+                                <div class="org-avatar">👤</div>
+                                <div class="org-nama">Heni Purnomo</div>
+                                <div class="org-jabatan">Kasi Pelayanan</div>
+                            </div>
+                        </div>
+
+                        <div class="org-col">
+                            <div class="org-col-line"></div>
+                            <div class="org-card">
+                                <div class="org-avatar">👤</div>
+                                <!-- ISI DATA: nama kasi kesejahteraan belum diketahui -->
+                                <div class="org-nama">Sugend Rohadi</div>
+                                <div class="org-jabatan">Kasi Kesejahteraan</div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="org-connector-v"></div>
+
+                    <!-- Level 4: Kepala Dusun -->
+                    <div class="org-level">
+
+                        <div class="org-col">
+                            <div class="org-col-line"></div>
+                            <div class="org-card">
+                                <div class="org-avatar">🌾</div>
+                                <!-- ISI DATA: nama kadus Gembirit -->
+                                <div class="org-nama">Pudji Heru</div>
+                                <div class="org-jabatan">Kadus Gembirit</div>
+                            </div>
+                        </div>
+
+                        <div class="org-col">
+                            <div class="org-col-line"></div>
+                            <div class="org-card">
+                                <div class="org-avatar">🏘️</div>
+                                <!-- ISI DATA: nama kadus Sidakarsa -->
+                                <div class="org-nama">—</div>
+                                <div class="org-jabatan">Kadus Sidakarsa</div>
+                            </div>
+                        </div>
+
+                        <div class="org-col">
+                            <div class="org-col-line"></div>
+                            <div class="org-card">
+                                <div class="org-avatar">🌿</div>
+                                <!-- ISI DATA: nama kadus Blater -->
+                                <div class="org-nama">—</div>
+                                <div class="org-jabatan">Kadus Blater</div>
+                            </div>
+                        </div>
+
+                        <div class="org-col">
+                            <div class="org-col-line"></div>
+                            <div class="org-card">
+                                <div class="org-avatar">🏡</div>
+                                <!-- ISI DATA: nama kadus Kemusuk -->
+                                <div class="org-nama">—</div>
+                                <div class="org-jabatan">Kadus Kemusuk</div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- ── Tabel Perangkat ── -->
+            <div class="perangkat-section fade-up-1">
+                <div class="section-label">Daftar Lengkap</div>
+                <h2 class="section-title">Perangkat Desa Pucang</h2>
+                <p style="font-size:13px; color:var(--abu);">
+                    <!-- ISI DATA: periode jabatan perangkat desa -->
+                </p>
+
+                <table class="perangkat-table">
+                    <thead>
+                        <tr>
+                            <th>No</th>
+                            <th>Nama</th>
+                            <th>Jabatan</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- ISI DATA: ganti semua "— Nama —" dengan nama perangkat desa yang sebenarnya -->
+                        <tr>
+                            <td>1</td>
+                            <td>Toni Dwi Sulistyo, A.Md</td>
+                            <td><span class="jabatan-badge">Kepala Desa</span></td>
+                        </tr>
+                        <tr>
+                            <td>2</td>
+                            <td>Andi Sujatmiko, S.Kom</td>
+                            <td><span class="jabatan-badge">Sekretaris Desa</span></td>
+                        </tr>
+                        <tr>
+                            <td>3</td>
+                            <td>Eko Apriantoro</td>
+                            <td><span class="jabatan-badge">Kaur Keuangan</span></td>
+                        </tr>
+                        <tr>
+                            <td>4</td>
+                            <td>Harsono</td>
+                            <td><span class="jabatan-badge">Kaur TU & Umum</span></td>
+                        </tr>
+                        <tr>
+                            <td>5</td>
+                            <td>Kurniawan Noviandri</td>
+                            <td><span class="jabatan-badge">Kaur Perencanaan</span></td>
+                        </tr>
+                        <tr>
+                            <td>6</td>
+                            <td>Wagino</td>
+                            <td><span class="jabatan-badge">Kasi Pemerintahan</span></td>
+
+                        </tr>
+                        <tr>
+                            <td>7</td>
+                            <td>Heni Purnomo</td>
+                            <td><span class="jabatan-badge">Kasi Pelayanan</span></td>
+
+                        </tr>
+                        <tr>
+                            <td>8</td>
+                            <td>Sugeng Rohadi</td>
+                            <td><span class="jabatan-badge">Kasi Kesejahteraan</span></td>
+
+                        </tr>
+                        <tr>
+                            <td>9</td>
+                            <td>Pak Heru</td>
+                            <td><span class="jabatan-badge">Kepala Dusun Gembirit</span></td>
+
+                        </tr>
+                        <tr>
+                            <td>10</td>
+                            <td class="placeholder-data">—</td>
+                            <td><span class="jabatan-badge">Kepala Dusun Sidakarsa</span></td>
+
+                        </tr>
+                        <tr>
+                            <td>11</td>
+                            <td class="placeholder-data">—</td>
+                            <td><span class="jabatan-badge">Kepala Dusun Blater</span></td>
+
+                        </tr>
+                        <tr>
+                            <td>12</td>
+                            <td class="placeholder-data">—</td>
+                            <td><span class="jabatan-badge">Kepala Dusun Kemusuk</span></td>
+                        </tr>
+                        <!-- Tambah baris jika ada perangkat lain -->
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- ══ FOOTER ══ -->
+    <footer>
+        <div class="footer-top">
+            <div class="footer-brand">
+                <div class="footer-brand-name">🏡 Desa Pucang</div>
+                <p>Website resmi Desa Pucang, Kecamatan Bawang, Kabupaten Banjarnegara. Melayani masyarakat dengan
+                    transparan dan informatif.</p>
+            </div>
+            <div class="footer-col">
+                <h4>Halaman</h4>
+                <ul>
+                    <li><a href="index.html">Beranda</a></li>
+                    <li><a href="profil.html">Profil Desa</a></li>
+                    <li><a href="lurah.html">Kapdes</a></li>
+                    <li><a href="pengurus.html">Pengurus</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4>Lainnya</h4>
+                <ul>
+                    <li><a href="statistik.html">Statistik</a></li>
+                    <li><a href="umkm.html">UMKM</a></li>
+                    <li><a href="galeri.html">Galeri</a></li>
+                    <li><a href="kontak.html">Kontak</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4>Dusun</h4>
+                <ul>
+                    <li><a href="gembirit.html">Gembirit</a></li>
+                    <li><a href="#">Sidakarsa <span style="font-size:10px;opacity:.5">(segera)</span></a></li>
+                    <li><a href="#">Blater <span style="font-size:10px;opacity:.5">(segera)</span></a></li>
+                    <li><a href="#">Kemusuk <span style="font-size:10px;opacity:.5">(segera)</span></a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <span>© 2026 Desa Pucang · Kec. Bawang · Banjarnegara</span>
+            <span>Made with Muhamad Fathan A A — X PPLG 1</span>
+        </div>
+    </footer>
+
+    <script src="main.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Wilayah — Desa Pucang</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    /* ── DUSUN CARDS ── */
+    .dusun-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 24px;
+      margin-top: 36px;
+    }
+
+    .dusun-card {
+      background: var(--putih);
+      border: 1.5px solid var(--abu-muda);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      cursor: pointer;
+      transition: var(--transition);
+      text-decoration: none;
+      color: inherit;
+      display: block;
+    }
+
+    .dusun-card:hover {
+      transform: translateY(-6px);
+      box-shadow: var(--shadow-lg);
+      border-color: var(--hijau-muda);
+    }
+
+    /* Dusun card yang belum siap / coming soon */
+    .dusun-card.disabled {
+      opacity: .55;
+      cursor: not-allowed;
+      pointer-events: none;
+    }
+
+    .dusun-banner {
+      height: 160px;
+      position: relative;
+      display: flex;
+      align-items: flex-end;
+      padding: 16px;
+      overflow: hidden;
+    }
+
+    .dusun-banner::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, rgba(0, 0, 0, .6) 0%, transparent 60%);
+      z-index: 1;
+    }
+
+    .dusun-banner .emoji {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -60%);
+      font-size: 56px;
+      z-index: 0;
+    }
+
+    .dusun-banner .dusun-no {
+      position: relative;
+      z-index: 2;
+      background: var(--emas);
+      color: var(--hijau-tua);
+      font-size: 11px;
+      font-weight: 700;
+      padding: 3px 10px;
+      border-radius: 99px;
+      letter-spacing: .06em;
+    }
+
+    .dusun-banner .coming-soon-tag {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      z-index: 3;
+      background: rgba(0, 0, 0, .45);
+      color: rgba(255, 255, 255, .8);
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: .08em;
+      padding: 3px 9px;
+      border-radius: 99px;
+      text-transform: uppercase;
+    }
+
+    /* warna tiap dusun */
+    .dusun-card:nth-child(1) .dusun-banner {
+      background: linear-gradient(135deg, #1a4731, #2d7a4f);
+    }
+
+    .dusun-card:nth-child(2) .dusun-banner {
+      background: linear-gradient(135deg, #1a3d47, #2d6b7a);
+    }
+
+    .dusun-card:nth-child(3) .dusun-banner {
+      background: linear-gradient(135deg, #3d2d1a, #7a5c2d);
+    }
+
+    .dusun-card:nth-child(4) .dusun-banner {
+      background: linear-gradient(135deg, #2d1a47, #5c2d7a);
+    }
+
+    .dusun-body {
+      padding: 20px;
+    }
+
+    .dusun-name {
+      font-family: var(--font-display);
+      font-size: 20px;
+      color: var(--hijau-tua);
+      margin-bottom: 6px;
+    }
+
+    .dusun-desc {
+      font-size: 13px;
+      color: var(--abu);
+      line-height: 1.6;
+      margin-bottom: 14px;
+    }
+
+    .dusun-stats {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .dusun-stat {
+      background: var(--krem);
+      border: 1px solid var(--abu-muda);
+      border-radius: var(--radius-sm);
+      padding: 6px 12px;
+      font-size: 12px;
+      color: var(--hijau-tua);
+      font-weight: 600;
+    }
+
+    .dusun-stat span {
+      color: var(--abu);
+      font-weight: 400;
+    }
+
+    .dusun-link {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 16px;
+      padding-top: 14px;
+      border-top: 1px solid var(--abu-muda);
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--hijau);
+    }
+
+    .dusun-card.disabled .dusun-link {
+      color: var(--abu);
+    }
+
+    .dusun-link .arrow {
+      width: 28px;
+      height: 28px;
+      background: rgba(45, 122, 79, .1);
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      font-size: 14px;
+      transition: var(--transition);
+    }
+
+    .dusun-card:hover .dusun-link .arrow {
+      background: var(--hijau);
+      color: var(--putih);
+    }
+
+    /* ── INFO UMUM ── */
+    .wilayah-info {
+      background: var(--putih);
+      border-radius: var(--radius-lg);
+      padding: 32px;
+      border: 1.5px solid var(--abu-muda);
+      margin-bottom: 48px;
+    }
+
+    .wilayah-info-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 40px;
+      align-items: start;
+      margin-top: 24px;
+    }
+
+    .info-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .info-table tr {
+      border-bottom: 1px solid var(--abu-muda);
+    }
+
+    .info-table tr:last-child {
+      border-bottom: none;
+    }
+
+    .info-table td {
+      padding: 11px 4px;
+      font-size: 14px;
+    }
+
+    .info-table td:first-child {
+      color: var(--abu);
+      width: 140px;
+    }
+
+    .info-table td:last-child {
+      font-weight: 600;
+      color: var(--gelap);
+    }
+
+    .info-table td.placeholder-data {
+      color: var(--abu);
+      font-weight: 400;
+      font-style: italic;
+    }
+
+    .peta-placeholder {
+      background: linear-gradient(135deg, var(--hijau-tua), var(--hijau));
+      border-radius: var(--radius-md);
+      height: 260px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: rgba(255, 255, 255, .7);
+      gap: 8px;
+      font-size: 13px;
+    }
+
+    .peta-placeholder .icon {
+      font-size: 40px;
+    }
+
+    .peta-placeholder small {
+      font-size: 11px;
+      opacity: .6;
+    }
+
+    /* ── STATS BAR ── */
+    .stats-bar {
+      background: var(--hijau-tua);
+      border-radius: var(--radius-md);
+      padding: 28px 32px;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 24px;
+      margin-bottom: 48px;
+    }
+
+    .stats-bar-item {
+      text-align: center;
+      color: var(--putih);
+    }
+
+    .stats-bar-item .num {
+      font-family: var(--font-display);
+      font-size: 32px;
+      color: var(--emas-muda);
+      line-height: 1;
+    }
+
+    .stats-bar-item .lbl {
+      font-size: 12px;
+      opacity: .65;
+      margin-top: 4px;
+      letter-spacing: .05em;
+    }
+
+    @media (max-width: 768px) {
+      .wilayah-info-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .stats-bar {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 480px) {
+      .stats-bar {
+        grid-template-columns: repeat(2, 1fr);
+        padding: 20px 16px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- ══ NAVBAR ══ -->
+  <nav class="navbar">
+    <div class="navbar-inner">
+      <a href="index.html" class="nav-brand">
+        <div class="nav-logo">🏡</div>
+        <div class="nav-title-text">
+          Desa Pucang
+          <span>Kec. Bawang · Banjarnegara</span>
+        </div>
+      </a>
+      <div class="nav-links">
+        <a href="index.html">Beranda</a>
+        <a href="profil.html">Profil</a>
+        <a href="lurah.html">Kapdes</a>
+        <a href="pengurus.html">Pengurus</a>
+        <a href="statistik.html">Statistik</a>
+        <a href="umkm.html">UMKM</a>
+        <a href="galeri.html">Galeri</a>
+        <a href="kontak.html">Kontak</a>
+      </div>
+      <div class="nav-toggle" id="navToggle">
+        <span></span><span></span><span></span>
+      </div>
+    </div>
+    <div class="nav-mobile" id="navMobile">
+      <a href="index.html">Beranda</a>
+      <a href="profil.html">Profil</a>
+      <a href="lurah.html">Kapdes</a>
+      <a href="pengurus.html">Pengurus</a>
+      <a href="statistik.html">Statistik</a>
+      <a href="umkm.html">UMKM</a>
+      <a href="galeri.html">Galeri</a>
+      <a href="kontak.html">Kontak</a>
+    </div>
+  </nav>
+
+  <!-- ══ PAGE HERO ══ -->
+  <div class="page-hero">
+    <div class="page-hero-content">
+      <div class="page-hero-badge">🗺️ Wilayah</div>
+      <h1>Wilayah Desa Pucang</h1>
+      <p>Desa Pucang terdiri dari 4 dusun utama yang tersebar di wilayah Kecamatan Bawang, Kabupaten Banjarnegara.</p>
+      <div class="breadcrumb">
+        <a href="index.html">Beranda</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ MAIN CONTENT ══ -->
+  <div class="section">
+    <div class="container">
+
+      <!-- ── Gambaran Umum ── -->
+      <div class="wilayah-info fade-up">
+        <div class="section-label">Informasi Wilayah</div>
+        <h2 class="section-title">Gambaran Umum Desa Pucang</h2>
+        <div class="wilayah-info-grid">
+
+          <!-- Tabel data desa — isi kolom kedua sesuai data resmi -->
+          <table class="info-table">
+            <tr>
+              <td>Nama Desa</td>
+              <td>Desa Pucang</td>
+            </tr>
+            <tr>
+              <td>Kecamatan</td>
+              <td>Bawang</td>
+            </tr>
+            <tr>
+              <td>Kabupaten</td>
+              <td>Banjarnegara</td>
+            </tr>
+            <tr>
+              <td>Provinsi</td>
+              <td>Jawa Tengah</td>
+            </tr>
+            <tr>
+              <td>Luas Wilayah</td>
+              <!-- ISI DATA: luas wilayah desa (misal: 427,5 Ha) -->
+              <td>324 Hektar<small style="color:var(--abu);font-weight:400"></small></td>
+            </tr>
+            <tr>
+              <td>Jumlah Dusun</td>
+              <td>4 Dusun</td>
+            </tr>
+          </table>
+
+          <!-- Peta: ganti div ini dengan <iframe> embed Google Maps -->
+          <!-- Cara embed: Google Maps → Share → Embed a map → copy kode iframe-nya -->
+          <div>
+            <iframe
+              src="https://www.google.com/maps/embed?pb=!4v1779634809708!6m8!1m7!1sB93SXoWhz0VKt9q00F4d6Q!2m2!1d-7.398107612325702!2d109.6589285397784!3f194.06!4f-13.769999999999996!5f0.7820865974627469"
+              width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy"
+              referrerpolicy="no-referrer-when-downgrade"></iframe>
+            <p style="font-size:12px; color:var(--abu); margin-top:10px; text-align:center;">
+              Kec. Bawang · Kab. Banjarnegara · Jawa Tengah
+            </p>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ── Stats Bar — ISI angka sesuai data desa ── -->
+      <div class="stats-bar fade-up-1">
+        <div class="stats-bar-item">
+          <div class="num">4</div>
+          <div class="lbl">Dusun</div>
+        </div>
+        <div class="stats-bar-item">
+          <div class="num">10</div>
+          <div class="lbl">Total RW</div>
+        </div>
+        <div class="stats-bar-item">
+          <div class="num">39</div>
+          <div class="lbl">Total RT</div>
+        </div>
+        <div class="stats-bar-item">
+          <div class="num">7.211</div>
+          <div class="lbl">Jiwa</div>
+        </div>
+      </div>
+
+      <!-- ── Dusun Cards ── -->
+      <div class="section-header fade-up-2">
+        <div class="section-label">Pilih Dusun</div>
+        <h2 class="section-title">4 Dusun di Desa Pucang</h2>
+        <p class="section-desc">Klik salah satu dusun untuk melihat informasi lengkap, struktur organisasi, dan daftar
+          RT/RW.</p>
+      </div>
+
+      <div class="dusun-grid">
+
+        <!-- ── Dusun 1: Gembirit (SUDAH SIAP) ── -->
+        <a href="gembirit.html" class="dusun-card fade-up-1">
+          <div class="dusun-banner">
+            <div class="emoji">🌾</div>
+            <span class="dusun-no">Dusun 1</span>
+          </div>
+          <div class="dusun-body">
+            <div class="dusun-name">Gembirit</div>
+            <p class="dusun-desc">Dusun Gembirit merupakan salah satu dusun terbesar di Desa Pucang dengan wilayah yang
+              luas dan penduduk yang padat.</p>
+            <div class="dusun-stats">
+              <!-- ISI DATA: jumlah RW, RT, KK Gembirit -->
+              <div class="dusun-stat">— <span>RW</span></div>
+              <div class="dusun-stat">— <span>RT</span></div>
+              <div class="dusun-stat">— <span>KK</span></div>
+            </div>
+            <div class="dusun-link">
+              <span>Lihat Detail Dusun</span>
+              <div class="arrow">→</div>
+            </div>
+          </div>
+        </a>
+
+        <!-- ── Dusun 2: Jatikarsa (BELUM SIAP — hapus class "disabled" & tambah href nanti) ── -->
+        <div class="dusun-card disabled fade-up-2">
+          <div class="dusun-banner">
+            <div class="emoji">🏘️</div>
+            <span class="dusun-no">Dusun 2</span>
+            <span class="coming-soon-tag">Segera Hadir</span>
+          </div>
+          <div class="dusun-body">
+            <div class="dusun-name">Sidakarsa</div>
+            <p class="dusun-desc">Dusun Sidakarsa dikenal dengan kegiatan masyarakat yang aktif dan potensi pertanian
+              yang cukup besar di wilayahnya.</p>
+            <div class="dusun-stats">
+              <div class="dusun-stat">— <span>RW</span></div>
+              <div class="dusun-stat">— <span>RT</span></div>
+              <div class="dusun-stat">— <span>KK</span></div>
+            </div>
+            <div class="dusun-link">
+              <span>Sedang dalam pengerjaan</span>
+              <div class="arrow">🔒</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── Dusun 3: Blater (BELUM SIAP) ── -->
+        <div class="dusun-card disabled fade-up-3">
+          <div class="dusun-banner">
+            <div class="emoji">🌿</div>
+            <span class="dusun-no">Dusun 3</span>
+            <span class="coming-soon-tag">Segera Hadir</span>
+          </div>
+          <div class="dusun-body">
+            <div class="dusun-name">Blater</div>
+            <p class="dusun-desc">Dusun Blater memiliki lingkungan yang asri dengan berbagai potensi UMKM dan kegiatan
+              warga yang beragam.</p>
+            <div class="dusun-stats">
+              <div class="dusun-stat">— <span>RW</span></div>
+              <div class="dusun-stat">— <span>RT</span></div>
+              <div class="dusun-stat">— <span>KK</span></div>
+            </div>
+            <div class="dusun-link">
+              <span>Sedang dalam pengerjaan</span>
+              <div class="arrow">🔒</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── Dusun 4: Kemusuk (BELUM SIAP) ── -->
+        <div class="dusun-card disabled fade-up-3">
+          <div class="dusun-banner">
+            <div class="emoji">🏡</div>
+            <span class="dusun-no">Dusun 4</span>
+            <span class="coming-soon-tag">Segera Hadir</span>
+          </div>
+          <div class="dusun-body">
+            <div class="dusun-name">Kemusuk</div>
+            <p class="dusun-desc">Dusun Kemusuk terletak di bagian desa dengan suasana yang tenang dan masyarakat yang
+              guyub rukun.</p>
+            <div class="dusun-stats">
+              <div class="dusun-stat">— <span>RW</span></div>
+              <div class="dusun-stat">— <span>RT</span></div>
+              <div class="dusun-stat">— <span>KK</span></div>
+            </div>
+            <div class="dusun-link">
+              <span>Sedang dalam pengerjaan</span>
+              <div class="arrow">🔒</div>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- end .dusun-grid -->
+
+    </div>
+  </div>
+
+  <!-- ══ FOOTER ══ -->
+  <footer>
+    <div class="footer-top">
+      <div class="footer-brand">
+        <div class="footer-brand-name">🏡 Desa Pucang</div>
+        <p>Website resmi Desa Pucang, Kecamatan Bawang, Kabupaten Banjarnegara. Melayani masyarakat dengan transparan
+          dan informatif.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Halaman</h4>
+        <ul>
+          <li><a href="index.html">Beranda</a></li>
+          <li><a href="profil.html">Profil Desa</a></li>
+          <li><a href="lurah.html">Kapdes</a></li>
+          <li><a href="pengurus.html">Pengurus</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Lainnya</h4>
+        <ul>
+          <li><a href="statistik.html">Statistik</a></li>
+          <li><a href="umkm.html">UMKM</a></li>
+          <li><a href="galeri.html">Galeri</a></li>
+          <li><a href="kontak.html">Kontak</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Dusun</h4>
+        <ul>
+          <li><a href="gembirit.html">Gembirit</a></li>
+          <li><a href="#">Sidakarsa <span style="font-size:10px;opacity:.5">(segera)</span></a></li>
+          <li><a href="#">Blater <span style="font-size:10px;opacity:.5">(segera)</span></a></li>
+          <li><a href="#">Kemusuk <span style="font-size:10px;opacity:.5">(segera)</span></a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Desa Pucang · Kec. Bawang · Banjarnegara</span>
+      <span>Made with Muhamad Fathan A A — X PPLG 1</span>
+    </div>
+  </footer>
+
+  <script src="main.js"></script>
+</body>
+
+</html>
